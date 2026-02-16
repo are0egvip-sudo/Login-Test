@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SV - نظام تسجيل مع JSON</title>
+    <title>SV - نظام JSON متكامل</title>
     <style>
         * {
             margin: 0;
@@ -17,7 +17,7 @@
             background: linear-gradient(145deg, #ffe4ec 0%, #ffd0dd 50%, #ffb6c7 100%);
             display: flex;
             align-items: center;
-            justify-contnt: center;
+            justify-content: center;
             padding: 20px;
         }
 
@@ -209,6 +209,18 @@
             background: rgba(255,255,255,0.3);
             border-radius: 50px;
         }
+
+        .json-preview {
+            background: rgba(0,0,0,0.05);
+            padding: 10px;
+            border-radius: 20px;
+            margin-top: 10px;
+            font-size: 0.7rem;
+            direction: ltr;
+            text-align: left;
+            max-height: 100px;
+            overflow: auto;
+        }
     </style>
 </head>
 <body>
@@ -216,7 +228,7 @@
         <!-- الشعار -->
         <div class="logo">
             <h1>SV</h1>
-            <p>نظام JSON • آمن • حقيقي</p>
+            <p>نظام JSON • حفظ حقيقي</p>
         </div>
 
         <!-- التبويبات -->
@@ -272,9 +284,14 @@
         <!-- رسائل -->
         <div id="messageArea"></div>
 
-        <!-- معلومات JSON -->
+        <!-- حالة JSON -->
         <div class="json-status" id="jsonStatus">
-            📁 ملف m.json قيد التحميل...
+            📁 جاري تحميل ملف m.json...
+        </div>
+
+        <!-- معاينة JSON (للتجربة) -->
+        <div id="jsonPreviewArea" class="json-preview hidden">
+            <div id="jsonPreviewContent"></div>
         </div>
 
         <!-- قسم الترحيب بعد تسجيل الدخول -->
@@ -292,6 +309,7 @@
     <script>
         // ================ إدارة ملف JSON ================
         const JSON_FILE = 'm.json'; // اسم ملف JSON
+        const STORAGE_KEY = 'sv_json_database'; // مفتاح التخزين في localStorage
 
         // قاعدة البيانات في الذاكرة
         let database = { users: [] };
@@ -302,43 +320,87 @@
                 const statusEl = document.getElementById('jsonStatus');
                 statusEl.innerHTML = '📁 جاري تحميل ملف m.json...';
                 
-                // محاولة تحميل الملف
+                // أولاً: نحاول نجيب البيانات من localStorage (إذا في حفظ سابق)
+                const savedDB = localStorage.getItem(STORAGE_KEY);
+                if (savedDB) {
+                    database = JSON.parse(savedDB);
+                    statusEl.innerHTML = `✅ تم تحميل البيانات من localStorage (${database.users.length} مستخدم)`;
+                    updateJSONPreview();
+                    console.log('📁 تم التحميل من localStorage:', database);
+                    return;
+                }
+                
+                // ثانياً: نحاول نجيب من ملف m.json
                 const response = await fetch(JSON_FILE);
                 
                 if (!response.ok) {
-                    throw new Error(`❌ خطأ في تحميل الملف: ${response.status}`);
+                    throw new Error(`ملف m.json غير موجود`);
                 }
                 
                 const data = await response.json();
                 database = data;
                 
-                statusEl.innerHTML = `✅ تم تحميل ملف m.json بنجاح (${database.users.length} مستخدم)`;
+                // نحفظ نسخة في localStorage كاحتياط
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(database));
+                
+                statusEl.innerHTML = `✅ تم تحميل ملف m.json (${database.users.length} مستخدم)`;
+                updateJSONPreview();
                 console.log('📁 الملف المحمل:', database);
                 
             } catch (error) {
                 console.error('خطأ في تحميل JSON:', error);
-                document.getElementById('jsonStatus').innerHTML = '⚠️ لم يتم العثور على m.json - سيتم استخدام التخزين المؤقت';
                 
-                // استخدام بيانات افتراضية إذا ما لقينا الملف
+                // إذا ما لقينا ملف، نستخدم بيانات افتراضية
                 database = {
                     users: [
-                        { id: 1, username: "lina", password: "lina123", email: "lina@test.com", name: "لينا محمد", age: 24, city: "دمشق" }
+                        { 
+                            id: 1, 
+                            username: "lina", 
+                            password: "lina123", 
+                            email: "lina@test.com", 
+                            name: "لينا محمد", 
+                            age: 24, 
+                            city: "دمشق" 
+                        },
+                        { 
+                            id: 2, 
+                            username: "sara", 
+                            password: "sara456", 
+                            email: "sara@test.com", 
+                            name: "سارة أحمد", 
+                            age: 22, 
+                            city: "حلب" 
+                        }
                     ]
                 };
+                
+                // نحفظ البيانات الافتراضية
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(database));
+                
+                document.getElementById('jsonStatus').innerHTML = '⚠️ تم إنشاء قاعدة بيانات جديدة افتراضية';
+                updateJSONPreview();
             }
         }
 
-        // ================ حفظ في ملف JSON ================
+        // ================ حفظ في ملف JSON (محاكاة) ================
         async function saveToJSON(newData) {
             try {
-                // في التطبيق الحقيقي، هذا الجزء يحتاج Backend
-                // لكن للتجربة، راح نخزن في localStorage
-                localStorage.setItem('m_json_backup', JSON.stringify(newData, null, 2));
+                // في المتصفح، لا يمكننا تعديل ملفات حقيقية مباشرة
+                // لذلك نستخدم localStorage كبديل
                 
                 // نحدث قاعدة البيانات في الذاكرة
                 database = newData;
                 
-                document.getElementById('jsonStatus').innerHTML = '💾 تم حفظ البيانات في localStorage (للتجربة)';
+                // نحفظ في localStorage
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(newData, null, 2));
+                
+                // نحدث واجهة المستخدم
+                document.getElementById('jsonStatus').innerHTML = `💾 تم حفظ البيانات في localStorage (${newData.users.length} مستخدم)`;
+                updateJSONPreview();
+                
+                // محاكاة تنزيل ملف JSON للتأكيد
+                simulateJSONDownload(newData);
+                
                 console.log('✅ تم حفظ البيانات:', newData);
                 
                 return true;
@@ -346,6 +408,36 @@
                 console.error('❌ فشل الحفظ:', error);
                 return false;
             }
+        }
+
+        // ================ محاكاة تنزيل ملف JSON ================
+        function simulateJSONDownload(data) {
+            // هذا الخيار يتيح للمستخدم تنزيل ملف JSON حقيقي
+            const jsonString = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            // نعرض رابط التنزيل في الـ Console
+            console.log('📥 لتحميل ملف m.json المحدث:');
+            console.log(url);
+            
+            // يمكن إظهار رسالة للمستخدم
+            if (confirm('✅ تم حفظ البيانات! هل تريد تنزيل ملف m.json المحدث؟')) {
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'm.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        // ================ تحديث معاينة JSON ================
+        function updateJSONPreview() {
+            const previewArea = document.getElementById('jsonPreviewArea');
+            const previewContent = document.getElementById('jsonPreviewContent');
+            
+            previewArea.classList.remove('hidden');
+            previewContent.textContent = JSON.stringify(database, null, 2);
         }
 
         // ================ البحث عن مستخدم ================
@@ -362,7 +454,12 @@
         async function addUser(userData) {
             // نتأكد ما فيش تكرار
             if (userExists(userData.username)) {
-                return { success: false, message: 'اسم المستخدم موجود مسبقاً' };
+                return { success: false, message: '❌ اسم المستخدم موجود مسبقاً' };
+            }
+
+            // نتأكد من البيانات المطلوبة
+            if (!userData.username || !userData.password) {
+                return { success: false, message: '❌ اسم المستخدم وكلمة المرور مطلوبان' };
             }
 
             // نضيف ID جديد
@@ -370,7 +467,13 @@
             
             const newUser = {
                 id: newId,
-                ...userData
+                username: userData.username,
+                password: userData.password,
+                email: userData.email || 'غير محدد',
+                name: userData.name || userData.username,
+                age: userData.age || 'غير محدد',
+                city: userData.city || 'غير محدد',
+                created_at: new Date().toISOString()
             };
 
             // نضيف للقاعدة
@@ -380,9 +483,9 @@
             const saved = await saveToJSON(database);
             
             if (saved) {
-                return { success: true, message: 'تم إنشاء الحساب بنجاح', user: newUser };
+                return { success: true, message: '✅ تم إنشاء الحساب بنجاح و حفظه في JSON', user: newUser };
             } else {
-                return { success: false, message: 'فشل في حفظ البيانات' };
+                return { success: false, message: '❌ فشل في حفظ البيانات' };
             }
         }
 
@@ -430,7 +533,7 @@
             const user = findUser(username, password);
 
             if (user) {
-                showMessage('✅ تم التحقق من المعلومات بنجاح!', 'success');
+                showMessage('✅ معلومات صحيحة! جاري تسجيل الدخول...', 'success');
                 
                 setTimeout(() => {
                     // إخفاء أقسام الدخول
@@ -451,14 +554,20 @@
                         <p>🎂 <strong>العمر:</strong> ${user.age || 'غير محدد'}</p>
                         <p>🏙️ <strong>المدينة:</strong> ${user.city || 'غير محدد'}</p>
                         <p>🆔 <strong>رقم المستخدم:</strong> ${user.id}</p>
+                        ${user.created_at ? `<p>📅 <strong>تاريخ التسجيل:</strong> ${new Date(user.created_at).toLocaleDateString('ar')}</p>` : ''}
                     `;
                     
-                    document.getElementById('jsonStatus').innerHTML = `✅ تم استيراد معلومات ${user.username} من ملف m.json`;
+                    document.getElementById('jsonStatus').innerHTML = `✅ تم استيراد معلومات ${user.username} من ملف JSON`;
                 }, 1000);
                 
             } else {
                 showMessage('❌ اسم المستخدم أو كلمة المرور غير صحيحة', 'error');
-                document.getElementById('jsonStatus').innerHTML = '⚠️ لم يتم العثور على المستخدم في ملف m.json';
+                
+                // عرض المستخدمين الموجودين للتجربة
+                const usersList = database.users.map(u => u.username).join('، ');
+                if (usersList) {
+                    showMessage(`المستخدمون الموجودون: ${usersList}`, 'info');
+                }
             }
         });
 
@@ -503,12 +612,11 @@
                 document.getElementById('regAge').value = '';
                 document.getElementById('regCity').value = '';
                 
-                // عرض عدد المستخدمين الجديد
-                document.getElementById('jsonStatus').innerHTML = `📁 تم تحديث m.json - الآن ${database.users.length} مستخدم`;
-                
                 // ننقل المستخدم لتسجيل الدخول
                 setTimeout(() => {
                     loginTab.click();
+                    // نعرض رسالة تأكيد الحفظ
+                    showMessage(`✨ تم حفظ ${username} في ملف JSON بنجاح`, 'success');
                 }, 1500);
                 
             } else {
@@ -529,12 +637,33 @@
         // ================ تحميل JSON عند بدء الصفحة ================
         loadJSON();
 
-        // ================ فتح JSON في Console ================
-        console.log('🌐 لرؤية قاعدة البيانات اكتب: showDB()');
+        // ================ دوال مساعدة للتجربة ================
         window.showDB = () => {
             console.log('📁 قاعدة البيانات الحالية:', database);
             return database;
         };
+
+        window.downloadJSON = () => {
+            const jsonString = JSON.stringify(database, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'm.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        };
+
+        window.resetDB = () => {
+            localStorage.removeItem(STORAGE_KEY);
+            location.reload();
+        };
+
+        // نعرض التعليمات في Console
+        console.log('🌟 أوامر المساعدة:');
+        console.log('showDB() - عرض قاعدة البيانات');
+        console.log('downloadJSON() - تنزيل ملف m.json');
+        console.log('resetDB() - إعادة تعيين قاعدة البيانات');
     </script>
 </body>
 </html>
