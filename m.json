@@ -1,12 +1,34 @@
 {
   "users": [
     {
-      "username": "عم عيال محمد",
-      "password": "عم عيال محمد",
-      "createdAt": "2026-02-16T17:12:48.866Z",
-      "lastLogin": "2026-02-16T17:12:58.728Z"
+      "id": 1,
+      "username": "lina",
+      "password": "lina123",
+      "email": "lina@example.com",
+      "name": "لينا محمد",
+      "age": 24,
+      "city": "دمشق",
+      "favorite_color": "زهري"
+    },
+    {
+      "id": 2,
+      "username": "sara",
+      "password": "sara456",
+      "email": "sara@example.com",
+      "name": "سارة أحمد",
+      "age": 22,
+      "city": "حلب",
+      "favorite_color": "أحمر"
+    },
+    {
+      "id": 3,
+      "username": "noor",
+      "password": "noor789",
+      "email": "noor@example.com",
+      "name": "نور حسن",
+      "age": 27,
+      "city": "اللاذقية",
+      "favorite_color": "بنفسجي"
     }
-  ],
-  "lastUpdated": "2026-02-16T17:12:58.728Z",
-  "version": "1.0"
+  ]
 }
