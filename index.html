@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - SV كيوت</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #ffe4ec 0%, #ffd0dd 50%, #ffb6c7 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 200, 220, 0.5);
+            border-radius: 60px;
+            padding: 50px 40px;
+            box-shadow: 0 30px 60px rgba(212, 74, 107, 0.2),
+                        0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+            transition: all 0.5s ease;
+        }
+
+        .auth-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 40px 80px rgba(212, 74, 107, 0.3),
+                        0 0 0 2px rgba(255, 255, 255, 0.7) inset;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #d44a6b, #ff8aae);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 4px;
+            filter: drop-shadow(0 5px 15px rgba(212, 74, 107, 0.3));
+        }
+
+        .logo p {
+            color: #b24e6a;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #b24e6a;
+            margin-bottom: 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #d44a6b, #ffb6c1);
+            border-radius: 10px;
+        }
+
+        .toggle-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.4);
+            border: 2px solid rgba(212, 74, 107, 0.2);
+            border-radius: 50px;
+            color: #9e4e66;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background: #d44a6b;
+            border-color: #d44a6b;
+            color: white;
+            box-shadow: 0 10px 20px rgba(212, 74, 107, 0.3);
+        }
+
+        .toggle-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(212, 74, 107, 0.2);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #9e4e66;
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            margin-right: 10px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.6);
+            border: 2px solid rgba(212, 74, 107, 0.2);
+            border-radius: 50px;
+            font-size: 1rem;
+            color: #4a2a33;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #d44a6b;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 0 5px rgba(212, 74, 107, 0.1);
+        }
+
+        .input-field::placeholder {
+            color: #b28e9a;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #d44a6b, #ff8aae);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            margin-top: 10px;
+            box-shadow: 0 10px 20px rgba(212, 74, 107, 0.3);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(212, 74, 107, 0.4);
+        }
+
+        .action-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .message {
+            padding: 15px 20px;
+            border-radius: 50px;
+            margin: 20px 0;
+            font-size: 0.95rem;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.error {
+            background: rgba(255, 100, 100, 0.2);
+            border: 2px solid #ff6b6b;
+            color: #b32b2b;
+        }
+
+        .message.success {
+            background: rgba(100, 255, 150, 0.2);
+            border: 2px solid #6bff8a;
+            color: #1f7a3b;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .welcome-message h2 {
+            font-size: 2.5rem;
+            color: #d44a6b;
+            margin-bottom: 20px;
+        }
+
+        .welcome-message p {
+            color: #b24e6a;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        .welcome-message .emoji {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .logout-btn {
+            padding: 15px 40px;
+            background: rgba(212, 74, 107, 0.2);
+            border: 2px solid #d44a6b;
+            border-radius: 50px;
+            color: #d44a6b;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #d44a6b;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(212, 74, 107, 0.3);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* زر تنزيل ملف JSON */
+        .download-btn {
+            width: 100%;
+            padding: 12px;
+            background: rgba(212, 74, 107, 0.1);
+            border: 2px dashed #d44a6b;
+            border-radius: 50px;
+            color: #d44a6b;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .download-btn:hover {
+            background: rgba(212, 74, 107, 0.2);
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-card" id="authCard">
+        <!-- الشعار -->
+        <div class="logo">
+            <h1>SV</h1>
+            <p>كيوت • أنيق • آمن</p>
+        </div>
+
+        <!-- قسم تسجيل الدخول / حساب جديد -->
+        <div id="authSection">
+            <div class="toggle-buttons">
+                <button class="toggle-btn active" id="loginTab">تسجيل دخول</button>
+                <button class="toggle-btn" id="registerTab">حساب جديد</button>
+            </div>
+
+            <!-- نموذج تسجيل الدخول -->
+            <div id="loginForm">
+                <div class="section-title">تسجيل الدخول</div>
+                <div class="input-group">
+                    <label>👤 اسم المستخدم</label>
+                    <input type="text" id="loginUsername" class="input-field" placeholder="أدخل اسم المستخدم">
+                </div>
+                <div class="input-group">
+                    <label>🔒 كلمة المرور</label>
+                    <input type="password" id="loginPassword" class="input-field" placeholder="أدخل كلمة المرور">
+                </div>
+                <button class="action-btn" id="loginBtn">دخول ✨</button>
+            </div>
+
+            <!-- نموذج إنشاء حساب جديد -->
+            <div id="registerForm" class="hidden">
+                <div class="section-title">حساب جديد</div>
+                <div class="input-group">
+                    <label>👤 اسم المستخدم</label>
+                    <input type="text" id="regUsername" class="input-field" placeholder="اختر اسم مستخدم">
+                </div>
+                <div class="input-group">
+                    <label>🔒 كلمة المرور</label>
+                    <input type="password" id="regPassword" class="input-field" placeholder="اختر كلمة مرور">
+                </div>
+                <div class="input-group">
+                    <label>🔒 تأكيد كلمة المرور</label>
+                    <input type="password" id="regConfirmPassword" class="input-field" placeholder="أعد كتابة كلمة المرور">
+                </div>
+                <button class="action-btn" id="registerBtn">إنشاء حساب 🎀</button>
+            </div>
+
+            <!-- مكان عرض الرسائل -->
+            <div id="messageArea"></div>
+            
+            <!-- زر تنزيل ملف m.json -->
+            <button class="download-btn" id="downloadJsonBtn">📥 تحميل ملف m.json</button>
+        </div>
+
+        <!-- قسم الترحيب بعد تسجيل الدخول -->
+        <div id="welcomeSection" class="hidden">
+            <div class="welcome-message">
+                <div class="emoji">🌸</div>
+                <h2 id="welcomeUsername"></h2>
+                <p>أهلاً بكِ في عالم SV</p>
+                <button class="logout-btn" id="logoutBtn">تسجيل خروج</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================ نظام التخزين في ملف m.json ================
+        const STORAGE_KEY = 'm'; // اسم الملف m.json
+
+        // دالة لجلب قاعدة البيانات من m.json
+        function getDatabase() {
+            const db = localStorage.getItem(STORAGE_KEY);
+            if (db) {
+                return JSON.parse(db);
+            }
+            // إذا كانت قاعدة البيانات فاضية، ننشئ هيكل جديد
+            return { 
+                users: [],
+                lastUpdated: new Date().toISOString(),
+                version: "1.0"
+            };
+        }
+
+        // دالة لحفظ قاعدة البيانات في m.json
+        function saveDatabase(db) {
+            // نضيف وقت آخر تحديث
+            db.lastUpdated = new Date().toISOString();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(db, null, 2));
+            
+            // عرض في الكونسول بشكل مرتب
+            console.log('💾 تم الحفظ في m.json:', db);
+        }
+
+        // دالة للبحث عن مستخدم باسم المستخدم
+        function findUserByUsername(username) {
+            const db = getDatabase();
+            return db.users.find(u => u.username === username);
+        }
+
+        // دالة لإضافة مستخدم جديد
+        function addUser(username, password) {
+            const db = getDatabase();
+            
+            // نتأكد ما فيش مستخدم بنفس الاسم
+            if (db.users.find(u => u.username === username)) {
+                return false;
+            }
+            
+            // نضيف المستخدم الجديد مع وقت الإنشاء
+            db.users.push({ 
+                username, 
+                password,
+                createdAt: new Date().toISOString(),
+                lastLogin: null
+            });
+            
+            saveDatabase(db);
+            return true;
+        }
+
+        // دالة للتحقق من صحة تسجيل الدخول
+        function validateUser(username, password) {
+            const db = getDatabase();
+            const user = db.users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                // تحديث وقت آخر دخول
+                user.lastLogin = new Date().toISOString();
+                saveDatabase(db);
+                return true;
+            }
+            return false;
+        }
+
+        // دالة لتنزيل ملف m.json
+        function downloadJsonFile() {
+            const db = getDatabase();
+            const jsonStr = JSON.stringify(db, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'm.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showMessage('✅ تم تنزيل ملف m.json بنجاح', 'success');
+        }
+
+        // ================ إدارة واجهة المستخدم ================
+        const authSection = document.getElementById('authSection');
+        const welcomeSection = document.getElementById('welcomeSection');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginTab = document.getElementById('loginTab');
+        const registerTab = document.getElementById('registerTab');
+        const messageArea = document.getElementById('messageArea');
+        const welcomeUsername = document.getElementById('welcomeUsername');
+
+        // التبديل بين تبويب تسجيل الدخول وحساب جديد
+        loginTab.addEventListener('click', () => {
+            loginTab.classList.add('active');
+            registerTab.classList.remove('active');
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+            messageArea.innerHTML = '';
+        });
+
+        registerTab.addEventListener('click', () => {
+            registerTab.classList.add('active');
+            loginTab.classList.remove('active');
+            registerForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+            messageArea.innerHTML = '';
+        });
+
+        // دالة لعرض الرسائل
+        function showMessage(text, type) {
+            messageArea.innerHTML = `<div class="message ${type}">${text}</div>`;
+        }
+
+        // ================ عملية إنشاء حساب جديد ================
+        document.getElementById('registerBtn').addEventListener('click', () => {
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
+            const confirmPassword = document.getElementById('regConfirmPassword').value.trim();
+
+            if (!username || !password || !confirmPassword) {
+                showMessage('❌ كل الحقول مطلوبة', 'error');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showMessage('❌ كلمة المرور غير متطابقة', 'error');
+                return;
+            }
+
+            if (password.length < 4) {
+                showMessage('❌ كلمة المرور يجب أن تكون 4 أحرف على الأقل', 'error');
+                return;
+            }
+
+            if (addUser(username, password)) {
+                showMessage('✅ تم إنشاء الحساب بنجاح! يمكنك تسجيل الدخول الآن', 'success');
+                
+                document.getElementById('regUsername').value = '';
+                document.getElementById('regPassword').value = '';
+                document.getElementById('regConfirmPassword').value = '';
+                
+                setTimeout(() => {
+                    loginTab.click();
+                }, 1500);
+            } else {
+                showMessage('❌ اسم المستخدم موجود مسبقاً', 'error');
+            }
+        });
+
+        // ================ عملية تسجيل الدخول ================
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            if (!username || !password) {
+                showMessage('❌ اسم المستخدم وكلمة المرور مطلوبان', 'error');
+                return;
+            }
+
+            if (validateUser(username, password)) {
+                showMessage('✅ تم تسجيل الدخول بنجاح! جاري التحويل...', 'success');
+                
+                setTimeout(() => {
+                    authSection.classList.add('hidden');
+                    welcomeSection.classList.remove('hidden');
+                    welcomeUsername.textContent = `أهلاً ${username} 🌸`;
+                    
+                    localStorage.setItem('sv_logged_in', 'true');
+                    localStorage.setItem('sv_current_user', username);
+                    
+                    document.getElementById('loginUsername').value = '';
+                    document.getElementById('loginPassword').value = '';
+                    messageArea.innerHTML = '';
+                }, 1000);
+            } else {
+                showMessage('❌ اسم المستخدم أو كلمة المرور غير صحيحة', 'error');
+            }
+        });
+
+        // ================ تسجيل الخروج ================
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            welcomeSection.classList.add('hidden');
+            authSection.classList.remove('hidden');
+            loginTab.click();
+            
+            localStorage.removeItem('sv_logged_in');
+            localStorage.removeItem('sv_current_user');
+            
+            showMessage('👋 تم تسجيل الخروج بنجاح', 'success');
+        });
+
+        // ================ التحقق من حالة تسجيل الدخول عند تحميل الصفحة ================
+        (function checkLoginStatus() {
+            const loggedIn = localStorage.getItem('sv_logged_in');
+            const currentUser = localStorage.getItem('sv_current_user');
+            
+            if (loggedIn === 'true' && currentUser) {
+                authSection.classList.add('hidden');
+                welcomeSection.classList.remove('hidden');
+                welcomeUsername.textContent = `أهلاً ${currentUser} 🌸`;
+            }
+        })();
+
+        // ================ تنزيل ملف m.json ================
+        document.getElementById('downloadJsonBtn').addEventListener('click', downloadJsonFile);
+
+        // ================ عرض محتوى m.json في الكونسول ================
+        console.log('📁 محتوى ملف m.json:');
+        console.log(getDatabase());
+        
+        // ================ إحصائيات قاعدة البيانات ================
+        const stats = getDatabase();
+        console.log(`👥 عدد المستخدمين: ${stats.users.length}`);
+        console.log(`🕒 آخر تحديث: ${stats.lastUpdated}`);
+    </script>
+</body>
+</html>
